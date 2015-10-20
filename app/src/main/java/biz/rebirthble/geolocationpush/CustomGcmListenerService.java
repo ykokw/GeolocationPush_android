@@ -3,7 +3,6 @@ package biz.rebirthble.geolocationpush;
 
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -35,73 +34,36 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
     protected static final int GEOFENCE_EXPIRATION_IN_MILLISECONDS =
             GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
 
-    private PendingIntent mGeofencePendingIntent;
-
     private GoogleApiClient mGoogleApiClient;
 
-    private NCMBObject geoFenceCenter;
-
-    private GeofencingRequest.Builder requestBuilder;
-
-    private boolean connectFlag;
+    private GeofencingRequest mGeofenceRequest;
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
 
-        //プッシュ通知受信時の挙動をカスタマイズ
-
         //ペイロードデータの取得
         if (data.containsKey("com.nifty.Data")) {
-
             try {
                 JSONObject json = new JSONObject(data.getString("com.nifty.Data"));
 
                 //Locationデータの取得
                 NCMBObject point = new NCMBObject("Location");
                 point.setObjectId(json.getString("location_id"));
-                try {
-                    point.fetchObject();
-                } catch (NCMBException e) {
-                    e.printStackTrace();
-                }
-
-                //geofenceの設定
-                geoFenceCenter = point;
-
-                Location centerPoint = geoFenceCenter.getGeolocation("geo");
-
-                Geofence geofence = new Geofence.Builder()
-                        // Set the request ID of the geofence. This is a string to identify this
-                        // geofence.
-                        .setRequestId(geoFenceCenter.getString("name"))
-
-                        .setCircularRegion(
-                                centerPoint.getLatitude(),
-                                centerPoint.getLongitude(),
-                                GEOFENCE_RADIUS_IN_METERS
-                        )
-                        .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                Geofence.GEOFENCE_TRANSITION_EXIT)
-                        .build();
-
-                GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-                builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-                builder.addGeofence(geofence);
-                requestBuilder = builder;
-
-                Location geolocation = point.getGeolocation("geo");
+                point.fetchObject();
 
                 Log.d(TAG, "location name:" + point.getString("name"));
-                Log.d(TAG, "lat:" + geolocation.getLatitude() + " lng:" + geolocation.getLongitude());
 
+                //geofenceの作成
+                createGeofenceRequest(point);
 
-                buildGoogleApiClient();
+                //Google API Clientのビルドと接続
+                connectGoogleApiClient();
 
-                mGoogleApiClient.connect();
 
             } catch (JSONException e) {
                 //エラー処理
+                Log.e(TAG, "error:" + e.getMessage());
+            } catch (NCMBException e) {
                 Log.e(TAG, "error:" + e.getMessage());
             }
         }
@@ -111,21 +73,40 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
     }
 
 
-    protected synchronized void buildGoogleApiClient() {
+    protected synchronized void connectGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        connectFlag = false;
+        mGoogleApiClient.connect();
+    }
+
+    private void createGeofenceRequest(NCMBObject point) {
+
+        Geofence geofence = new Geofence.Builder()
+                // Set the request ID of the geofence. This is a string to identify this
+                // geofence.
+                .setRequestId(point.getString("name"))
+                .setCircularRegion(
+                        point.getGeolocation("geo").getLatitude(),
+                        point.getGeolocation("geo").getLongitude(),
+                        GEOFENCE_RADIUS_IN_METERS
+                )
+                .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                        Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build();
+
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofence(geofence);
+        mGeofenceRequest = builder.build();
     }
 
     private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
-        if (mGeofencePendingIntent != null) {
-            return mGeofencePendingIntent;
-        }
+
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
         // calling addGeofences() and removeGeofences().
@@ -139,25 +120,19 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
 
         LocationServices.GeofencingApi.addGeofences(
                 mGoogleApiClient,
-                requestBuilder.build(),
+                mGeofenceRequest,
                 getGeofencePendingIntent()
         ).setResultCallback(this);
-
-        connectFlag = true;
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.d(TAG, "Connection Suspended");
-
-        connectFlag = true;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "Connection Failed");
-
-        connectFlag = true;
     }
 
     @Override
