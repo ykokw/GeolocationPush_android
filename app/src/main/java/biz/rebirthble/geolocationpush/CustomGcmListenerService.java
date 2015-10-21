@@ -85,9 +85,8 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
 
     private void createGeofenceRequest(NCMBObject point) {
 
+        //Geofenceオブジェクトの作成
         Geofence geofence = new Geofence.Builder()
-                // Set the request ID of the geofence. This is a string to identify this
-                // geofence.
                 .setRequestId(point.getString("name"))
                 .setCircularRegion(
                         point.getGeolocation("geo").getLatitude(),
@@ -138,8 +137,6 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
     @Override
     public void onResult(Result result) {
         Log.d(TAG, "onResult:" + result.toString());
-
-        mGoogleApiClient.disconnect();
     }
 
     @Override
