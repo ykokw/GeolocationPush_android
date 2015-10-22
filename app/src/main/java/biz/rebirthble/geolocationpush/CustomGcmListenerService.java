@@ -3,7 +3,6 @@ package biz.rebirthble.geolocationpush;
 
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -11,17 +10,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationServices;
-import com.nifty.cloud.mb.core.NCMBException;
 import com.nifty.cloud.mb.core.NCMBGcmListenerService;
 import com.nifty.cloud.mb.core.NCMBObject;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Arrays;
 
 public class CustomGcmListenerService extends NCMBGcmListenerService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -49,68 +40,31 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
     public void onMessageReceived(String from, Bundle data) {
 
         //ペイロードデータの取得
-        if (data.containsKey("com.nifty.Data")) {
-            try {
-                JSONObject json = new JSONObject(data.getString("com.nifty.Data"));
-
-                //Locationデータの取得
-                NCMBObject point = new NCMBObject("Location");
-                point.setObjectId(json.getString("location_id"));
-                point.fetchObject();
-
-                Log.d(TAG, "location name:" + point.getString("name"));
-
-                //geofenceの作成
-                createGeofenceRequest(point);
-
-                //Google API Clientのビルドと接続
-                connectGoogleApiClient();
 
 
-            } catch (JSONException e) {
-                //エラー処理
-                Log.e(TAG, "error:" + e.getMessage());
-            } catch (NCMBException e) {
-                Log.e(TAG, "error:" + e.getMessage());
-            }
-        }
-
-        //デフォルトの通知を実行する場合はsuper.onMessageReceivedを実行する
-        //super.onMessageReceived(from, data);
+        //デフォルトの受信処理
+        super.onMessageReceived(from, data);
     }
 
-
-    protected synchronized void connectGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-        mGoogleApiClient.connect();
-    }
-
+    /**
+     * GeofenceRequestの作成を行う
+     * @param point GeofenceRequestの作成に使うロケーション情報
+     */
     private void createGeofenceRequest(NCMBObject point) {
 
-        //Geofenceオブジェクトの作成
-        Geofence geofence = new Geofence.Builder()
-                .setRequestId(point.getString("name"))
-                .setCircularRegion(
-                        point.getGeolocation("geo").getLatitude(),
-                        point.getGeolocation("geo").getLongitude(),
-                        GEOFENCE_RADIUS_IN_METERS
-                )
-                .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                        Geofence.GEOFENCE_TRANSITION_EXIT)
-                .build();
-
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofence(geofence);
-        mGeofenceRequest = builder.build();
     }
 
+    /**
+     * Google API Clientのビルドと接続を行う
+     */
+    protected synchronized void connectGoogleApiClient() {
+
+    }
+
+    /**
+     * Geofence用のPendingIntentを作成する
+     * @return Geofence用のPendingIntent
+     */
     private PendingIntent getGeofencePendingIntent() {
 
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
@@ -120,31 +74,13 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
                 FLAG_UPDATE_CURRENT);
     }
 
+    /**
+     * Google API Clientへの接続が行われた場合に呼び出されるコールバック
+     * @param bundle
+     */
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d(TAG, "Connection Succeeded.");
 
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String geofenceName = preferences.getString(GEOFENCE_NAME, "");
-
-        if (!geofenceName.equals("")) {
-            LocationServices.GeofencingApi.removeGeofences(
-                    mGoogleApiClient,
-                    Arrays.asList(geofenceName)
-            );
-        }
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(
-                GEOFENCE_NAME,
-                mGeofenceRequest.getGeofences().get(0).getRequestId()
-        );
-
-        LocationServices.GeofencingApi.addGeofences(
-                mGoogleApiClient,
-                mGeofenceRequest,
-                getGeofencePendingIntent()
-        ).setResultCallback(this);
     }
 
     @Override
