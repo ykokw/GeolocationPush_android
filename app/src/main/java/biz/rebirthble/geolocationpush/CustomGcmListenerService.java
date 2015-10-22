@@ -3,6 +3,7 @@ package biz.rebirthble.geolocationpush;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import com.nifty.cloud.mb.core.NCMBObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 public class CustomGcmListenerService extends NCMBGcmListenerService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback
@@ -33,6 +36,10 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
 
     protected static final int GEOFENCE_EXPIRATION_IN_MILLISECONDS =
             GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
+
+    protected static final String PREFS_NAME = "GeolocationPush";
+
+    protected static final String GEOFENCE_NAME = "GeofenceName";
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -116,6 +123,22 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "Connection Succeeded.");
+
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String geofenceName = preferences.getString(GEOFENCE_NAME, "");
+
+        if (!geofenceName.equals("")) {
+            LocationServices.GeofencingApi.removeGeofences(
+                    mGoogleApiClient,
+                    Arrays.asList(geofenceName)
+            );
+        }
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(
+                GEOFENCE_NAME,
+                mGeofenceRequest.getGeofences().get(0).getRequestId()
+        );
 
         LocationServices.GeofencingApi.addGeofences(
                 mGoogleApiClient,
