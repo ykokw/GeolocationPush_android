@@ -1,5 +1,7 @@
 package biz.rebirthble.geolocationpush;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
