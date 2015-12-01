@@ -14,6 +14,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
+import com.nifty.cloud.mb.core.NCMB;
 import com.nifty.cloud.mb.core.NCMBException;
 import com.nifty.cloud.mb.core.NCMBGcmListenerService;
 import com.nifty.cloud.mb.core.NCMBObject;
@@ -52,6 +53,12 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
         if (data.containsKey("com.nifty.Data")) {
             try {
                 JSONObject json = new JSONObject(data.getString("com.nifty.Data"));
+
+                NCMB.initialize(
+                        this,
+                        "YOUR_APP_KEY",
+                        "YOUR_CLIENT_KEY"
+                );
 
                 //Locationデータの取得
                 NCMBObject point = new NCMBObject("Location");
