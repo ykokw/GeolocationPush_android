@@ -206,7 +206,7 @@ installation.getRegistrationIdInBackground("YOUR_PROJECT_NUMBER", new DoneCallba
  - name: ニフティ、geo: 35.696174,139.68951
 - **geoフィールドは入力形式を緯度経度に変更してください**
 
-<img src="/assets/images/20150526/datastore.png" alt="データストアの操作">
+<img src="/readme-img/datastore.png" alt="データストアの操作">
 
 ### Geofence設定までの流れ
 
