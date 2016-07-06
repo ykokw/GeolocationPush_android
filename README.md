@@ -203,7 +203,8 @@ installation.getRegistrationIdInBackground("YOUR_PROJECT_NUMBER", new DoneCallba
 - データストアにLocationという名前のクラスを作成
 - Locationクラスにnameとgeoフィールドを追加
 - 新しいレコードを追加して店舗を登録
- - name: ニフティ、geo: 35.696174,139.68951
+ - 現在地を緯度経度で指定してください
+ - 例）name: ニフティ、geo: 35.696174,139.68951
 - **geoフィールドは入力形式を緯度経度に変更してください**
 
 <img src="/readme-img/datastore.png" alt="データストアの操作">
