@@ -519,23 +519,3 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions,
 Geolocation Pushが受信されましたか？  
 （通知がすぐ表示されるので実感がありませんが、すでに領域内にいるためです）
 （帰り道のロケーションを追加して、通知が表示されるか試してみてください）
-
-## まとめ
-
-### mobile backendのおかげでやらずに済んだこと
-
-- Push通知サーバーの構築
-- ロケーションを保存するDBサーバーの構築
-
-**アプリの実装だけに注力することができます！**
-
-### mobile backendのおかげで楽になること
-
-- DBサーバーの設計変更
-
-## 参考情報
-
-- [クイックスタート（Android）](http://mb.cloud.nifty.com/doc/current/introduction/quickstart_android.html)
-- [SDKガイド（Android）：プッシュ通知](http://mb.cloud.nifty.com/doc/current/sdkguide/android/push.html)
-- [Creating and Monitoring Geofences](http://developer.android.com/intl/ja/training/location/geofencing.html)
-
