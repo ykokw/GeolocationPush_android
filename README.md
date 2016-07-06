@@ -2,9 +2,9 @@
 
 ## 概要
 
-<img src="/readme-img/demo_app_flow.png" alt="アプリの概要">
-
 [ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)のプッシュ通知・位置情報検索を利用して、位置情報に連動したプッシュ通知を配信するO2Oアプリを作成するチュートリアルです
+
+<img src="/readme-img/demo_app_flow.png" alt="アプリの概要">
 
 ## 事前準備
 
@@ -38,7 +38,6 @@ mBaaS（mobile backend as a Service）とは、スマートフォンアプリで
 
 ### プロジェクトダウンロード
 
-以下のリンクからサンプルプロジェクトのリポジトリを開き、  
 下記リンクをクリックしてプロジェクトをダウンロードしてください▼
 
 __[サンプルプロジェクト](https://github.com/NIFTYCloud-mbaas/GeolocationPush_android/archive/masked_for_hands_on.zip)__
@@ -66,7 +65,7 @@ __[サンプルプロジェクト](https://github.com/NIFTYCloud-mbaas/Geolocati
 
 ### SDKの初期化設定
 
-MainActivityのonCreateメソッドにあるSDKの初期化処理を  
+MainActivityの`onCreate`メソッドにあるSDKの初期化処理を  
 作成したAPIキーに書き換えてください
 
 ```java
@@ -80,7 +79,7 @@ NCMB.initialize(
 ### GCMの有効化
 
 Google Developers Console（[https://console.developers.google.com](https://console.developers.google.com)）  
-にアクセスしてプロジェクトを作成してください。
+にアクセスしてプロジェクトを作成してください
 
 <img src="/readme-img/google_api_console.png" alt="Google API Consoleの画面">
 
@@ -91,22 +90,21 @@ Google Cloud Messaging for Androidを有効にしてください
 
 ### GCM用のキーを取得
 
-認証情報のメニューから認証情報を追加ボタンをおして  
-APIキーを選択してください。
+認証情報のメニューから認証情報を追加ボタンを押してAPIキーを選択してください
 
 <img src="/readme-img/create_api_key_1.png" alt="GCM用のキー作成画面1">
 
-以下の画面ではサーバーキーを選択してください。
+以下の画面ではサーバーキーを選択してください
 
 <img src="/readme-img/create_api_key_2.png" alt="GCM用のキー作成画面2">
 
-サーバーキーの名前を入力してキーを作成してください。
+サーバーキーの名前を入力してキーを作成してください
 
 <img src="/readme-img/create_api_key_3.png" alt="GCM用のキー作成画面3">
 
 ニフティクラウド mobile backendのダッシュボードに戻ってキーを設定します
 
-アプリ設定メニューからプッシュ通知の設定をひらいてください
+アプリ設定メニューからプッシュ通知の設定を開いてください
 
 - プッシュ通知機能を許可
 
@@ -220,7 +218,7 @@ installation.getRegistrationIdInBackground("YOUR_PROJECT_NUMBER", new DoneCallba
 ### ロケーションの取得
 
 プッシュ通知内のデータ（ペイロード）を取得する場合は、  
-GcmListenerServiceを拡張し、onMessageReceivedメソッドを上書きします。
+GcmListenerServiceを拡張し、`onMessageReceived`メソッドを上書きします
 
 ```java
 @Override
@@ -243,10 +241,9 @@ public void onMessageReceived(String from, Bundle data) {
 
 ### ロケーションの取得
 
-ペイロードデータ内のlocation_idをもとに、  
-データストアからロケーションを取得します。
+ペイロードデータ内のlocation_idをもとに、データストアからロケーションを取得します
 
-JSONオブジェクトの作成後に続きの実装をしてください。
+JSONオブジェクトの作成後に続きの実装をしてください
 
 ```java
 JSONObject json = new JSONObject(data.getString("com.nifty.Data"));
@@ -270,8 +267,8 @@ Log.d(TAG, "location name:" + point.getString("name"));
 
 このあと実装するメソッドの呼び出しを追加
 
-- createGeofenceRequest(point)：Geofenceの作成
-- connectGoogleApiClient()：Google API Clientのビルドと接続
+- `createGeofenceRequest(point)`：Geofenceの作成
+- `connectGoogleApiClient()`：Google API Clientのビルドと接続
 
 ```java
 JSONObject json = new JSONObject(data.getString("com.nifty.Data"));
@@ -292,7 +289,7 @@ connectGoogleApiClient();
 
 ### GeofenceRequestの作成
 
-createGeofenceRequestメソッドを実装していきます。
+`createGeofenceRequest`メソッドを実装していきます
 
 - Geofenceオブジェクトの作成
 
@@ -311,9 +308,9 @@ Geofence geofence = new Geofence.Builder()
         .build();
 ```
 
-createGeofenceRequestメソッドを実装していきます。
+`createGeofenceRequest`メソッドを実装していきます
 
-- GeofencingRequestオブジェクトの作成
+- `GeofencingRequest`オブジェクトの作成
  - すでにGeofence内に端末があった場合も通知させる
 
 ```java
@@ -343,8 +340,7 @@ protected synchronized void connectGoogleApiClient() {
 
 ### PendingIntentの作成
 
-Geofenceを追加するときにPendingIntentが必要になるので、  
-getGeofencePendingIntentメソッドでPendingIntentを返すようにします。
+Geofenceを追加するときにPendingIntentが必要になるので、`getGeofencePendingIntent`メソッドで`PendingIntent`を返すようにします
 
 - サンプルプログラムでは実装済み
 
@@ -361,8 +357,7 @@ private PendingIntent getGeofencePendingIntent() {
 
 ### Geofenceの追加
 
-Google API Clientの接続後に実行されるコールバック（onConnectedメソッド）で  
-以前に設定したGeofenceの削除と、新規Geofenceの追加を行います。
+Google API Clientの接続後に実行されるコールバック（`onConnected`メソッド）で、以前に設定したGeofenceの削除と、新規Geofenceの追加を行います
 
 ```java
 @Override
@@ -405,8 +400,7 @@ LocationServices.GeofencingApi.addGeofences(
 
 ### Geofenceに入った場合のハンドリング
 
-Geofence内での動きがあった場合は、  
-GeofenceTransitionsIntentServiceクラスのonHandleIntentメソッドが呼び出されます。
+Geofence内での動きがあった場合は、`GeofenceTransitionsIntentService`クラスの`onHandleIntent`メソッドが呼び出されます
 
 ```java
 @Override
@@ -436,8 +430,8 @@ if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 ```
 
 - Geofence内に入ってきた場合にsendNotificationを実行する
- - sendNotificationが通知を表示させるメソッドです
-  - sendNotificationメソッドは実装済みです
+ - `sendNotification`が通知を表示させるメソッドです
+  - `sendNotification`メソッドは実装済みです
 
 ```java
 //Geofenceの名前を取得
