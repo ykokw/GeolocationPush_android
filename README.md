@@ -155,9 +155,9 @@ installation.getRegistrationIdInBackground("YOUR_PROJECT_NUMBER", new DoneCallba
 <uses-permission android:name="android.permission.WAKE_LOCK" />
 <uses-permission android:name="android.permission.VIBRATE" />
 <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-<permission android:name="biz.rebirthble.geolocationpush.permission.C2D_MESSAGE" 
+<permission android:name="biz.ncmb.geolocationpush.permission.C2D_MESSAGE"
     android:protectionLevel="signature" />
-<uses-permission android:name="biz.rebirthble.geolocationpush.permission.C2D_MESSAGE" />
+<uses-permission android:name="biz.ncmb.geolocationpush.permission.C2D_MESSAGE" />
 ```
 
 - receiverを定義
@@ -170,7 +170,7 @@ installation.getRegistrationIdInBackground("YOUR_PROJECT_NUMBER", new DoneCallba
     android:permission="com.google.android.c2dm.permission.SEND">
     <intent-filter>
         <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-        <category android:name="biz.rebirthble.geolocationpush"/>
+        <category android:name="biz.ncmb.geolocationpush"/>
     </intent-filter>
 </receiver>
 ```
@@ -181,7 +181,7 @@ installation.getRegistrationIdInBackground("YOUR_PROJECT_NUMBER", new DoneCallba
 
 ```xml
 <service
-    android:name="biz.rebirthble.geolocationpush.CustomGcmListenerService"
+    android:name="biz.ncmb.geolocationpush.CustomGcmListenerService"
     android:exported="false">
     <intent-filter>
         <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
@@ -364,7 +364,7 @@ Google API Clientの接続後に実行されるコールバック（`onConnected
 @Override
 public void onConnected(Bundle bundle) {
     //このあとここに処理を実装します
-} 
+}
 ```
 
 - 以前に設定したGeofenceの削除
@@ -452,7 +452,7 @@ sendNotification(geofenceName);
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="biz.rebirthble.geolocationpush" >
+    package="biz.ncmb.geolocationpush" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 ```
@@ -486,8 +486,8 @@ if (ContextCompat.checkSelfPermission(this,
 
 ```java
 @Override
-public void onRequestPermissionsResult(int requestCode, String[] permissions, 
-        int[] grantResults) 
+public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        int[] grantResults)
 {
     switch (requestCode) {
         case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {

@@ -1,4 +1,4 @@
-package biz.rebirthble.geolocationpush;
+package biz.ncmb.geolocationpush;
 
 
 import android.app.PendingIntent;
@@ -54,16 +54,10 @@ public class CustomGcmListenerService extends NCMBGcmListenerService
             try {
                 JSONObject json = new JSONObject(data.getString("com.nifty.Data"));
 
-                NCMB.initialize(
-                        this,
-                        "YOUR_APP_KEY",
-                        "YOUR_CLIENT_KEY"
-                );
-
                 //Locationデータの取得
                 NCMBObject point = new NCMBObject("Location");
                 point.setObjectId(json.getString("location_id"));
-                point.fetchObject();
+                point.fetch();
 
                 Log.d(TAG, "location name:" + point.getString("name"));
 

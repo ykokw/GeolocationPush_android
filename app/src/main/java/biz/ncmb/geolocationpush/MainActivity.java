@@ -1,4 +1,4 @@
-package biz.rebirthble.geolocationpush;
+package biz.ncmb.geolocationpush;
 
 import android.app.NotificationManager;
 import android.content.Context;
