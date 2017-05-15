@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         manager.cancelAll();
 
         NCMB.initialize(
-                this,
+                this.getApplicationContext(),
                 "YOUR_APP_KEY",
                 "YOUR_CLIENT_KEY"
         );
