@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="biz.rebirthble.geolocationpush" >
+    package="biz.ncmb.geolocationpush" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
@@ -8,7 +8,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="com.nifty.cloud.mb.core.NCMBApplicationController">
 
         <meta-data android:name="openPushStartActivity" android:value=".MainActivity"/>
 
@@ -18,13 +19,13 @@
         <uses-permission android:name="android.permission.WAKE_LOCK" />
         <uses-permission android:name="android.permission.VIBRATE" />
         <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-        <permission android:name="biz.rebirthble.geolocationpush.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-        <uses-permission android:name="biz.rebirthble.geolocationpush.permission.C2D_MESSAGE" />
+        <permission android:name="biz.ncmb.geolocationpush.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+        <uses-permission android:name="biz.ncmb.geolocationpush.permission.C2D_MESSAGE" />
 
 
 
         <activity
-            android:name=".MainActivity"
+            android:name="biz.ncmb.geolocationpush.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,14 +45,14 @@
         </receiver>
 
         <service
-            android:name="biz.rebirthble.geolocationpush.CustomGcmListenerService"
+            android:name="biz.ncmb.geolocationpush.CustomGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
 
-        <service android:name=".GeofenceTransitionsIntentService"/>
+        <service android:name="biz.ncmb.geolocationpush.GeofenceTransitionsIntentService"/>
 
     </application>
 
